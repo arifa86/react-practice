@@ -1,41 +1,40 @@
-// Import the react and react dom libraries
 import React from 'react';
 import ReactDom from 'react-dom';
-import faker from 'faker';
-import CommentDetails from "./components/CommentDetails";
-import ApprovalCard from "./components/ApprovalCard";
-import Message from "./components/Message";
+import "semantic-ui-css/semantic.min.css"
+import SeasonDisplay from "./components/SeasonDisplay";
+import Spinner from "./components/Spinner";
 
 class App extends React.Component {
+    state = {lat: null, errorMessage: ''};
 
-    constructor(props) {
-        super(props);
-        this.state = {lat: null, errorMessage: ''};
-
+    //Data loading...
+    componentDidMount() {
         window.navigator.geolocation.getCurrentPosition(
-            (position) => {
-                this.setState({lat: position.coords.latitude})
-            },
-            (err) => {
-                this.setState({errorMessage: err.message})
-            }
+            (position) => this.setState({lat: position.coords.latitude}),
+            (err) => this.setState({errorMessage: err.message})
         );
     }
 
-    // Required
-    render() {
+    renderContent() {
         if (this.state.errorMessage && !this.state.lat) {
             return <div className="ui container">Error: {this.state.errorMessage}</div>
         }
 
         if (!this.state.errorMessage && this.state.lat) {
             return (
-                <div className="ui container">
-                    Latitude: {this.state.lat}
-                </div>
+                <SeasonDisplay lat={this.state.lat}/>
             );
         }
-        return <div className="ui container">Loading</div>
+        return <Spinner message="Please accept location request"/>
+    }
+
+    // Required
+    render() {
+      return (
+          <div className="">
+              {this.renderContent()}
+          </div>
+      );
     }
 }
 
