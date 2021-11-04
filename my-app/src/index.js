@@ -6,48 +6,38 @@ import CommentDetails from "./components/CommentDetails";
 import ApprovalCard from "./components/ApprovalCard";
 import Message from "./components/Message";
 
+class App extends React.Component {
 
-function getTime() {
-    return (new Date()).toLocaleTimeString();
-};
+    constructor(props) {
+        super(props);
+        this.state = {lat: null, errorMessage: ''};
 
-// Create a react component
-const App = () => {
+        window.navigator.geolocation.getCurrentPosition(
+            (position) => {
+                this.setState({lat: position.coords.latitude})
+            },
+            (err) => {
+                this.setState({errorMessage: err.message})
+            }
+        );
+    }
 
-    return (
-        <div className="ui container">
-            <h2>Comments</h2>
-            <div className="ui container comments">
+    // Required
+    render() {
+        if (this.state.errorMessage && !this.state.lat) {
+            return <div className="ui container">Error: {this.state.errorMessage}</div>
+        }
 
-                <ApprovalCard>
-                    <CommentDetails author={faker.name.firstName() + " " + faker.name.lastName()}
-                                    postedOn={(new Date()).toLocaleTimeString()}
-                                    avatar={faker.image.avatar()}
-                                    content={faker.lorem.sentences()}/>
-                </ApprovalCard>
-
-                <ApprovalCard>
-                    <CommentDetails author={faker.name.firstName() + " " + faker.name.lastName()}
-                                    postedOn={(new Date()).toLocaleTimeString()}
-                                    avatar={faker.image.avatar()}
-                                    content={faker.lorem.sentences()}/>
-                </ApprovalCard>
-
-                <ApprovalCard>
-                    <CommentDetails author={faker.name.firstName() + " " + faker.name.lastName()}
-                                    postedOn={(new Date()).toLocaleTimeString()}
-                                    avatar={faker.image.avatar()}
-                                    content={faker.lorem.sentences()}/>
-                </ApprovalCard>
-
-                <Message header="Attention!">
-                    We have just changed our service agreements please see the documentation for details.
-                </Message>
-
-            </div>
-        </div>
-    );
-};
+        if (!this.state.errorMessage && this.state.lat) {
+            return (
+                <div className="ui container">
+                    Latitude: {this.state.lat}
+                </div>
+            );
+        }
+        return <div className="ui container">Loading</div>
+    }
+}
 
 // Take the react component and show it on the screen
 ReactDom.render(
